@@ -1,0 +1,178 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+void main() {
+  runApp(const QuoteApp());
+}
+
+class QuoteApp extends StatelessWidget {
+  const QuoteApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Random Quote Generator',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigoAccent),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        useMaterial3: true,
+      ),
+      home: const QuoteHomePage(),
+    );
+  }
+}
+
+class Quote {
+  final String text;
+  final String author;
+
+  Quote({required this.text, required this.author});
+}
+
+class QuoteHomePage extends StatefulWidget {
+  const QuoteHomePage({super.key});
+
+  @override
+  State<QuoteHomePage> createState() => _QuoteHomePageState();
+}
+
+class _QuoteHomePageState extends State<QuoteHomePage>
+    with SingleTickerProviderStateMixin {
+  final List<Quote> _quotes = [
+    Quote(
+        text: "The best way to get started is to quit talking and begin doing.",
+        author: "Walt Disney"),
+    Quote(
+        text:
+            "Don’t let yesterday take up too much of today.",
+        author: "Will Rogers"),
+    Quote(
+        text: "It always seems impossible until it’s done.",
+        author: "Nelson Mandela"),
+    Quote(
+        text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        author: "Winston Churchill"),
+    Quote(
+        text: "Dream big and dare to fail.",
+        author: "Norman Vaughan"),
+    Quote(
+        text:
+            "Your time is limited, don’t waste it living someone else’s life.",
+        author: "Steve Jobs"),
+    Quote(
+        text: "Happiness is not something ready-made. It comes from your own actions.",
+        author: "Dalai Lama"),
+  ];
+
+  late Quote _currentQuote;
+  final Random _random = Random();
+
+  @override
+  void initState() {
+    super.initState();
+    _currentQuote = _quotes[_random.nextInt(_quotes.length)];
+  }
+
+  void _generateNewQuote() {
+    setState(() {
+      _currentQuote = _quotes[_random.nextInt(_quotes.length)];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                  child: Container(
+                    key: ValueKey(_currentQuote.text),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 15,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '“${_currentQuote.text}”',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          '- ${_currentQuote.author}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.indigo[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton.icon(
+                onPressed: _generateNewQuote,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.indigoAccent,
+                  elevation: 5,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                ),
+                icon: const Icon(Icons.refresh_rounded, size: 24),
+                label: const Text(
+                  'New Quote',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
